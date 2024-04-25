@@ -130,18 +130,27 @@ async def simulate_one_iteration():
     result = {"address": addr}
 
     l1cachehit = l1check(addr)
-    result["L1_cache_hit"] = str(l1cachehit)
+
+    if l1cachehit:
+        result["L1_cache_hit"] = "Hit"
+    else:
+        result["L1_cache_hit"] = "Miss"
 
     if not l1cachehit:
         l1write(addr)
         vcachehit = victimcachecheck(addr)
-        result["Victim_cache_hit"] = str(vcachehit)
+        if vcachehit:
+            result["Victim_cache_hit"] = "Hit"
+        else:
+            result["Victim_cache_hit"] = "Miss"
 
         if not vcachehit:
             victimcachewrite(addr)
             l2cachehit = l2check(addr)
-            result["L2_cache_hit"] = str(l2cachehit)
-
+            if l2cachehit:
+                result["L2_cache_hit"] = "Hit"
+            else:
+                result["L2_cache_hit"] = "Miss"
             if not l2cachehit:
                 l2write(addr)
 
