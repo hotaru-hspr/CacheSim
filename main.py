@@ -1,7 +1,13 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 import random
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*']
+)
 
 memorylines = 2**10
 l1cachelines = 128
