@@ -14,7 +14,7 @@ l2cachelines = 256
 adr = []
 last = 0
 
-memory = [[random.randint(1, 9)] * 32 for _ in range(memorylines)]
+memory = [[random.randint(0, 1) for _ in range(32)] for _ in range(memorylines)]
 
 l1 = [[0] * 32 for _ in range(l1cachelines)]
 l2 = [[0] * 32 for _ in range(l2cachelines)]
@@ -35,7 +35,11 @@ def l1byteoffset(address):
 
 def l1write(address):
     line = int(address, 2) >> 6
-    l1[line % 128] = memory[line]
+    data = memory[line]
+    evicted_line = l1[line % 128]
+    l1[line % 128] = data
+    if evicted_line != [0] * 32:
+        victimcachewrite(address)
 
 
 def l1read(address):
@@ -139,8 +143,6 @@ async def simulate_one_iteration():
     else:
         result["L1_cache_hit"] = "Miss"
 
-    if not l1cachehit:
-        l1write(addr)
         vcachehit = victimcachecheck(addr)
         if vcachehit:
             result["Victim_cache_hit"] = "Hit"
@@ -148,14 +150,13 @@ async def simulate_one_iteration():
             result["Victim_cache_hit"] = "Miss"
 
         if not vcachehit:
-            victimcachewrite(addr)
             l2cachehit = l2check(addr)
             if l2cachehit:
                 result["L2_cache_hit"] = "Hit"
             else:
                 result["L2_cache_hit"] = "Miss"
-            if not l2cachehit:
                 l2write(addr)
+        l1write(addr)
 
     l1_cache_list = convert_to_binary_list(l1)
     victim_cache_list = convert_to_binary_list(victimcache)

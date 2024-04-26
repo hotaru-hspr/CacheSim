@@ -63,7 +63,10 @@
 							Get memory
 						</button>
 					</div>
-					<div class="mb-4 text-[#ADD8E6] rounded-lg p-4 text-xl square"></div>
+					<div
+						class="mb-4 text-[#ADD8E6] rounded-lg p-4 text-xl square"
+						style="font-size: 10px;"
+					></div>
 				</div>
 				<div class="flex justify-center space-x-4 py-5">
 					<div
