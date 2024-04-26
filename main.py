@@ -4,10 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import random
 
 app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['*']
-)
+app.add_middleware(CORSMiddleware, allow_origins=["*"])
 
 memorylines = 2**10
 l1cachelines = 128
@@ -17,11 +14,11 @@ l2cachelines = 256
 adr = []
 last = 0
 
-memory = [[random.randint(1, 9)] * 64 for _ in range(memorylines)]
+memory = [[random.randint(1, 9)] * 32 for _ in range(memorylines)]
 
-l1 = [[0] * 64 for _ in range(l1cachelines)]
-l2 = [[0] * 64 for _ in range(l2cachelines)]
-victimcache = [[0] * 64 for _ in range(l1victimcachelines)]
+l1 = [[0] * 32 for _ in range(l1cachelines)]
+l2 = [[0] * 32 for _ in range(l2cachelines)]
+victimcache = [[0] * 32 for _ in range(l1victimcachelines)]
 
 
 def l2byteoffset(address):
@@ -67,7 +64,7 @@ def l2write(address):
     data = memory[int(address, 2) >> 6]
     changed = False
     for i in range(4):
-        if l2[line + i] != [0] * 64:
+        if l2[line + i] != [0] * 32:
             l2[line + i] = data
             changed = True
     if not changed:
