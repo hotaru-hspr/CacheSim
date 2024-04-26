@@ -1,11 +1,12 @@
 <script lang="ts">
-	let l1_anim;
-	let l2_anim;
-	let v_cache;
-	let ram;
+	let l1_anim = true;
+	let l2_anim = true;
+	let v_anim = true;
+	let r_anim = true;
 
 	import { onMount } from 'svelte';
 
+	
 	interface GETResponse {
 		L1_cache: string[];
 		L1_cache_hit: string;
@@ -27,7 +28,6 @@
 	};
 
 	let animateHit = true;
-	let animateBall = true;
 
 	onMount(() => {
 		fetch('http://localhost:8000/')
@@ -43,6 +43,89 @@
 			.then((data) => {
 				console.log(data);
 				resp = data;
+				if (resp.L1_cache_hit == "Miss") {
+    l1_anim = true;
+    setTimeout(() => {
+        if (resp.Victim_cache_hit == "Miss") {
+            v_anim = true;
+            setTimeout(() => {
+							if (resp.L2_cache_hit == "Miss") {
+								l2_anim = true;
+								setTimeout(() => {
+										r_anim = true;
+										animateHit = true;
+								}, 1000);
+							} else {
+								l2_anim = true;
+								setTimeout(() => {
+										animateHit = true;
+								}, 1000);
+							}
+            }, 1000);
+        	} else {
+            v_anim = true;
+            setTimeout(() => {
+							if (resp.L2_cache_hit == "Miss") {
+								l2_anim = true;
+								setTimeout(() => {
+										r_anim = true;
+										animateHit = true;
+								}, 1000);
+							} else {
+									l2_anim = true;
+									setTimeout(() => {
+										animateHit = true;
+									}, 1000);
+							}
+            }, 1000);
+        	}
+    		}, 1000);
+	} else {
+    l1_anim = true;
+    setTimeout(() => {
+      if (resp.Victim_cache_hit == "Miss") {
+        v_anim = true;
+        setTimeout(() => {
+          if (resp.L2_cache_hit == "Miss") {
+            l2_anim = true;
+              setTimeout(() => {
+  	            r_anim = true;
+                animateHit = true;
+              }, 1000);
+              } else {
+  	              l2_anim = true;
+                  setTimeout(() => {
+                    animateHit = true;
+                  }, 1000);
+                }
+  	          }, 1000);
+      } else {
+        v_anim = true;
+        setTimeout(() => {
+          if (resp.L2_cache_hit == "Miss") {
+		        l2_anim = true;
+              setTimeout(() => {
+                r_anim = true;
+                animateHit = true;
+              }, 1000);
+          } else {
+              l2_anim = true;
+              setTimeout(() => {
+                animateHit = true;
+              }, 1000);
+            }
+          }, 1000);
+        }
+    }, 1000);
+	}
+				setTimeout(() =>  {
+					animateHit = true;
+					l1_anim = false;
+					v_anim = false;
+					l2_anim = false;
+					r_anim = false;
+				}, 1000);
+
 			});
 	}
 </script>
@@ -63,10 +146,10 @@
 						>
 							Get memory
 						</button>
-						<div bind:this={l1_anim} class="ball-l1"></div>
-						<div bind:this={v_cache} class="ball-v"></div>
-						<div bind:this={l2_anim} class="ball-l2"></div>
-						<div bind:this={ram} class="ball-r"></div>
+						<div class="ball-l1 {l1_anim ? 'ballanim-l1': ''}"></div>
+						<div class="ball-v {v_anim ? 'ballanim-v': ''}"></div>
+						<div class="ball-l2 {l2_anim ? 'ballanim-l2': ''}"></div>
+						<div class="ball-r {r_anim ? 'ballanim-r': ''}"></div>
 					</div>
 					<div class="mb-4 text-[#ADD8E6] rounded-lg p-4 text-xl square"></div>
 				</div>
@@ -288,14 +371,14 @@
 	}
 
 	.ballanim-l2 {
-		animation: l2-1 0.5s linear;
+		animation: l2-1 1s linear;
 	}
 
 	.ballanim-v {
-		animation: v-1 0.25s linear;
+		animation: v-1 1s linear;
 	}
 
 	.ballanim-l1 {
-		animation: l1-1 0.25s linear;
+		animation: l1-1 1s linear;
 	}
 </style>

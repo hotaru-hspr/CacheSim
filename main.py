@@ -42,7 +42,7 @@ def l1Write(addr):
     line = int(addr, 2) >> 6
     data = mainMemory[line]
     evicted_line = l1Cache[line % 128]
-    l1Cache[line % L1CacheLines] = data
+    l1Cache[line % l1CacheLines] = data
     if evicted_line != [0] * lineSize:
         victimCacheWrite(addr)
 
