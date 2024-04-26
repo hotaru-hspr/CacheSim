@@ -2,137 +2,152 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import random
+from collections import defaultdict
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"])
 
-memorylines = 2**10
-l1cachelines = 128
-l1victimcachelines = 4
-l2cachelines = 256
+# Define the Line Size
+lineSize = 32
 
-adr = []
-last = 0
+# Define the Main Memory
+mainMemoryLines = 2**10
+mainMemory = [[random.choice([i for i in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"]) for _ in range(lineSize)] for _ in range(mainMemoryLines)]
 
-memory = [[random.randint(0, 1) for _ in range(32)] for _ in range(memorylines)]
+# Define the L1 Cache
+l1CacheLines = 128
+l1Cache = [[0] * lineSize for _ in range(l1CacheLines)]
 
-l1 = [[0] * 32 for _ in range(l1cachelines)]
-l2 = [[0] * 32 for _ in range(l2cachelines)]
-victimcache = [[0] * 32 for _ in range(l1victimcachelines)]
+# Define the L2 Cache
+l2CacheLines = 256
+l2Cache = [[0] * lineSize for _ in range(l2CacheLines)]
 
+# Define the victim cache
+l1VictimLines = 4
+victimAddress = []
+victimCacheCount = 0
+victimCacheCounter = defaultdict(int)
+victimcache = [[0] * lineSize for _ in range(l1VictimLines)]
 
-def l2byteoffset(address):
-    return int(address[-6:], 2)
+# Get the ByteOffset for L1 and L2 Cache
+def ByteOffset(addr):
+    return int(addr[-6:], 2)
 
+# Get the SetNo for L1 and L2 Cache
+def SetNo(addr):
+    return int(addr[0:6], 2)
 
-def setno(address):
-    return int(address[0:6], 2)
+# Write to L1 cache
+def l1Write(addr):
+    line = int(addr, 2) >> 6
+    data = mainMemory[line]
+    evicted_line = l1Cache[line % 128]
+    l1Cache[line % L1CacheLines] = data
+    if evicted_line != [0] * lineSize:
+        victimCacheWrite(addr)
 
+# Read from L1 cache
+def l1Read(addr):
+    line = int(addr, 2) >> 6
+    return l1Cache[line % 128][int(ByteOffset(addr))]
 
-def l1byteoffset(address):
-    return int(address[-6:], 2)
-
-
-def l1write(address):
-    line = int(address, 2) >> 6
-    data = memory[line]
-    evicted_line = l1[line % 128]
-    l1[line % 128] = data
-    if evicted_line != [0] * 32:
-        victimcachewrite(address)
-
-
-def l1read(address):
-    line = int(address, 2) >> 6
-    return l1[line % 128][int(l1byteoffset(address))]
-
-
-def l2check(address):
-    line = setno(address) * 4
-    data = memory[int(address, 2) >> 6]
+# Check if line is present in L2 cache
+def l2Check(addr):
+    line = SetNo(addr) * 4
+    data = mainMemory[int(addr, 2) >> 6]
     for i in range(4):
-        if l2[line + i] == data:
+        if l2Cache[line + i] == data:
             return True
     return False
 
-
-def l2read(address):
-    line = setno(address) * 4
+# Read from L2 cache
+def l2Read(addr):
+    line = SetNo(addr) * 4
     for i in range(4):
-        if l2[line + i] == memory[int(address, 2) >> 6]:
-            return l2[line + i][l2byteoffset(address)]
+        if l2Cache[line + i] == mainMemory[int(addr, 2) >> 6]:
+            return l2Cache[line + i][ByteOffset(addr)]
 
-
-def l2write(address):
-    line = setno(address) * 4
-    data = memory[int(address, 2) >> 6]
-    changed = False
+# Write to L2 cache
+def l2Write(addr):
+    line = SetNo(addr) * 4
+    data = mainMemory[int(addr, 2) >> 6]
+    changed = 0
     for i in range(4):
-        if l2[line + i] != [0] * 32:
-            l2[line + i] = data
-            changed = True
+        if l2Cache[line + i] != [0] * 64:
+            l2Cache[line + i] = data
+            changed = 1
     if not changed:
-        l2.pop(line)
-        l2.insert(line + 3, data)
+        l2Cache.pop(line)
+        l2Cache.insert(line + 3, data)
 
+# Read from victim cache
+def victimCacheRead(addr):
+    addr = int(addr, 2)
+    victimCacheCounter[addr] += 1
+    if addr in victimAddress:
+        victimAddress.remove(addr)
+        victimAddress.append(addr)
+        victimCacheCounter[addr] += 1
+        return victimcache[victimAddress.index(addr)][ByteOffset(addr)]
+    return None
 
-def victimcacheread(address):
-    address = int(address, 2)
-    return victimcache[adr.index(address)][l1byteoffset(address)]
+# Write to victim cache
+def victimCacheWrite(addr):
+    line = int(addr, 2) >> 6
+    global victimCacheCount
+    addr = int(addr, 2)
 
-
-def victimcachewrite(address):
-    line = int(address, 2) >> 6
-    global last
-    address = int(address, 2)
-    if last < 4:
-        last += 1
-        adr.append(address)
-        victimcache[adr.index(address)] = memory[line]
+    if addr in victimAddress:
+        victimAddress.remove(addr)
+        victimAddress.append(addr)
     else:
-        adr.pop(0)
-        victimcache.pop(0)
-        adr.append(address)
-        victimcache.append(memory[line])
+        if len(victimAddress) < l1VictimLines:
+            victimAddress.append(addr)
+        else:
+            victimAddress.pop(0)
+            victimAddress.append(addr)
 
+    victimcache[victimAddress.index(addr)] = mainMemory[line]
 
-def victimcachecheck(address):
-    return int(address, 2) in adr
+# Check if line is present in victim cache
+def victimcachecheck(addr):
+    return int(addr, 2) in victimAddress
 
+# Check if line is present in L1 cache
+def l1check(addr):
+    line = int(addr, 2) >> 6
+    data = mainMemory[line]
+    return l1Cache[line % 128] == data
 
-def l1check(address):
-    line = int(address, 2) >> 6
-    data = memory[line]
-    return l1[line % 128] == data
-
-
+# Generate a random address from the processor
 def processor():
     address = random.randint(0, 65535)
     return bin(address)
 
-
-def convert_to_binary_list(cache):
-    binary_list = []
+# Convert cache to base64 list
+def convertToBinaryList(cache):
+    base64List = []
     for line in cache:
-        binary_data = "".join(str(bit) for bit in line)
-        binary_list.append(binary_data)
-    return binary_list
+        binaryData = "".join(str(bit) for bit in line)
+        base64List.append(binaryData)
+    return base64List
 
 
 @app.get("/")
-async def get_cache_states():
-    l1_cache_list = convert_to_binary_list(l1)
-    victim_cache_list = convert_to_binary_list(victimcache)
-    l2_cache_list = convert_to_binary_list(l2)
+async def getCacheStates():
+    l1CacheList = convertToBinaryList(l1Cache)
+    victimCacheList = convertToBinaryList(victimcache)
+    l2CacheList = convertToBinaryList(l2Cache)
+
     return {
-        "L1_cache": l1_cache_list,
-        "L2_cache": l2_cache_list,
-        "Victim_cache": victim_cache_list,
+        "L1_cache": l1CacheList,
+        "L2_cache": l2CacheList,
+        "Victim_cache": victimCacheList,
     }
 
 
 @app.post("/")
-async def simulate_one_iteration():
+async def simulateOneIteration():
     addr = processor()
     result = {"address": addr}
 
@@ -149,18 +164,19 @@ async def simulate_one_iteration():
         else:
             result["Victim_cache_hit"] = "Miss"
 
-        if not vcachehit:
-            l2cachehit = l2check(addr)
+            l2cachehit = l2Check(addr)
+
             if l2cachehit:
                 result["L2_cache_hit"] = "Hit"
             else:
                 result["L2_cache_hit"] = "Miss"
-                l2write(addr)
-        l1write(addr)
+                l2Write(addr)
 
-    l1_cache_list = convert_to_binary_list(l1)
-    victim_cache_list = convert_to_binary_list(victimcache)
-    l2_cache_list = convert_to_binary_list(l2)
+        l1Write(addr)
+
+    l1_cache_list = convertToBinaryList(l1Cache)
+    victim_cache_list = convertToBinaryList(victimcache)
+    l2_cache_list = convertToBinaryList(l2Cache)
 
     result["L1_cache"] = l1_cache_list
     result["Victim_cache"] = victim_cache_list
