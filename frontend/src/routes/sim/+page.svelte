@@ -306,8 +306,8 @@
 			opacity: 1;
 		}
 		100% {
-			transform: scale(0.5);
-			opacity: 0;
+			transform: scale(0.75);
+			opacity: 0.75;
 		}
 	}
 	@keyframes l1-1 {
@@ -359,22 +359,16 @@
 		}
 	}
 	.l1-hit {
-		animation:
-			l1-1 0.25s ease,
-			0.25s ease-out;
+		animation: ripple 0.5s ease;
 	}
 	.vic-hit {
-		animation: ripple 0.25s linear;
+		animation: ripple 0.5s ease;
 	}
 	.l2-hit {
-		animation:
-			l2-1 0.25s ease,
-			ripple 0.25s ease-out;
+		animation: ripple 0.5s ease;
 	}
 	.ram-hit {
-		animation:
-			ram-1 0.25s ease,
-			ripple 0.25s ease-out;
+		animation: ripple 0.5s ease;
 	}
 	.square {
 		width: 400px;
@@ -389,7 +383,7 @@
 		height: 400px;
 	}
 	.bg-svg {
-		background-image: url('lines.png');
+		background-image: url('https://raw.githubusercontent.com/hotaru-hspr/CacheSim/main/frontend/static/lines.png');
 		background-size: cover;
 		background-repeat: no-repeat;
 	}
