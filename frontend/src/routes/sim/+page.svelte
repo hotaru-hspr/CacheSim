@@ -389,7 +389,7 @@
 		height: 400px;
 	}
 	.bg-svg {
-		background-image: url('lines.svg');
+		background-image: url('lines.png');
 		background-size: cover;
 		background-repeat: no-repeat;
 	}
