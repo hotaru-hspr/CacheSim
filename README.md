@@ -5,6 +5,7 @@ A cache simulation program to demonstrate the Hit/Miss actions in L1, Victim and
 
 ## Tech Stack
 - Svelte + JS
+- TailwindCSS
 - FastAPI (Python)
 
 ## Team
