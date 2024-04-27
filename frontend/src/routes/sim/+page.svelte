@@ -195,7 +195,7 @@
 	}
 </script>
 
-<div class="relative bg-svg">
+<div class="relative bg-img">
 	<div class="flex flex-col justify-between items-center h-screen px-10">
 		<div>
 			<div class="text-center">
@@ -303,11 +303,23 @@
 	@keyframes ripple {
 		0% {
 			transform: scale(0);
-			opacity: 1;
+			opacity: 0;
 		}
-		100% {
+		25% {
+			transform: scale(0.25);
+			opacity: 0.25;
+		}
+		50% {
+			transform: scale(0.5);
+			opacity: 0.5;
+		}
+		75% {
 			transform: scale(0.75);
 			opacity: 0.75;
+		}
+		100% {
+			transform: scale(1);
+			opacity: 1;
 		}
 	}
 	@keyframes l1-1 {
@@ -382,9 +394,9 @@
 		width: 500px;
 		height: 400px;
 	}
-	.bg-svg {
+	.bg-img {
 		background-image: url('https://raw.githubusercontent.com/hotaru-hspr/CacheSim/main/frontend/static/lines.png');
-		background-size: cover;
+		background-size: 100% auto;
 		background-repeat: no-repeat;
 	}
 	.ball-l1 {
