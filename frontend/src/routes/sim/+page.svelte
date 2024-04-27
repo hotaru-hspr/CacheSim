@@ -1,12 +1,11 @@
 <script lang="ts">
-	let l1_anim = true;
-	let l2_anim = true;
-	let v_anim = true;
-	let r_anim = true;
+	let l1_anim = false;
+	let l2_anim = false;
+	let v_anim = false;
+	let r_anim = false;
 
 	import { onMount } from 'svelte';
 
-	
 	interface GETResponse {
 		L1_cache: string[];
 		L1_cache_hit: string;
@@ -27,7 +26,7 @@
 		address: ''
 	};
 
-	let animateHit = true;
+	let animateHit = false;
 
 	onMount(() => {
 		fetch('http://localhost:8000/')
@@ -43,90 +42,156 @@
 			.then((data) => {
 				console.log(data);
 				resp = data;
-				if (resp.L1_cache_hit == "Miss") {
-    l1_anim = true;
-    setTimeout(() => {
-        if (resp.Victim_cache_hit == "Miss") {
-            v_anim = true;
-            setTimeout(() => {
-							if (resp.L2_cache_hit == "Miss") {
-								l2_anim = true;
-								setTimeout(() => {
+				document.getElementById('getmem').disabled = true;
+
+				if (resp.L1_cache_hit == 'Miss') {
+					l1_anim = true;
+					setTimeout(() => {
+						if (resp.Victim_cache_hit == 'Miss') {
+							v_anim = true;
+							setTimeout(() => {
+								if (resp.L2_cache_hit == 'Miss') {
+									l2_anim = true;
+									setTimeout(() => {
 										r_anim = true;
-										animateHit = true;
-								}, 1000);
-							} else {
-								l2_anim = true;
-								setTimeout(() => {
-										animateHit = true;
-								}, 1000);
-							}
-            }, 1000);
-        	} else {
-            v_anim = true;
-            setTimeout(() => {
-							if (resp.L2_cache_hit == "Miss") {
-								l2_anim = true;
-								setTimeout(() => {
-										r_anim = true;
-										animateHit = true;
-								}, 1000);
-							} else {
+										setTimeout(() => {
+											animateHit = true;
+											setTimeout(() => {
+												animateHit = false;
+												l2_anim = false;
+												r_anim = false;
+												l1_anim = false;
+												v_anim = false;
+												enableButton();
+											}, 500);
+										}, 1000);
+									}, 1000);
+								} else {
 									l2_anim = true;
 									setTimeout(() => {
 										animateHit = true;
+										setTimeout(() => {
+											animateHit = false;
+											l2_anim = false;
+											l1_anim = false;
+											v_anim = false;
+											enableButton();
+										}, 500);
 									}, 1000);
-							}
-            }, 1000);
-        	}
-    		}, 1000);
-	} else {
-    l1_anim = true;
-    setTimeout(() => {
-      if (resp.Victim_cache_hit == "Miss") {
-        v_anim = true;
-        setTimeout(() => {
-          if (resp.L2_cache_hit == "Miss") {
-            l2_anim = true;
-              setTimeout(() => {
-  	            r_anim = true;
-                animateHit = true;
-              }, 1000);
-              } else {
-  	              l2_anim = true;
-                  setTimeout(() => {
-                    animateHit = true;
-                  }, 1000);
-                }
-  	          }, 1000);
-      } else {
-        v_anim = true;
-        setTimeout(() => {
-          if (resp.L2_cache_hit == "Miss") {
-		        l2_anim = true;
-              setTimeout(() => {
-                r_anim = true;
-                animateHit = true;
-              }, 1000);
-          } else {
-              l2_anim = true;
-              setTimeout(() => {
-                animateHit = true;
-              }, 1000);
-            }
-          }, 1000);
-        }
-    }, 1000);
-	}
-				setTimeout(() =>  {
-					animateHit = true;
-					l1_anim = false;
-					v_anim = false;
-					l2_anim = false;
-					r_anim = false;
-				}, 1000);
-
+								}
+							}, 1000);
+						} else {
+							v_anim = true;
+							setTimeout(() => {
+								if (resp.L2_cache_hit == 'Miss') {
+									l2_anim = true;
+									setTimeout(() => {
+										r_anim = true;
+										setTimeout(() => {
+											animateHit = true;
+											setTimeout(() => {
+												animateHit = false;
+												l2_anim = false;
+												r_anim = false;
+												l1_anim = false;
+												v_anim = false;
+												enableButton();
+											}, 500);
+										}, 1000);
+									}, 1000);
+								} else {
+									l2_anim = true;
+									setTimeout(() => {
+										animateHit = true;
+										setTimeout(() => {
+											animateHit = false;
+											l2_anim = false;
+											l1_anim = false;
+											v_anim = false;
+											enableButton();
+										}, 500);
+									}, 1000);
+								}
+							}, 1000);
+						}
+					}, 1000);
+				} else {
+					l1_anim = true;
+					setTimeout(() => {
+						if (resp.Victim_cache_hit == 'Miss') {
+							v_anim = false;
+							setTimeout(() => {
+								if (resp.L2_cache_hit == 'Miss') {
+									l2_anim = false;
+									setTimeout(() => {
+										r_anim = false;
+										setTimeout(() => {
+											animateHit = true;
+											setTimeout(() => {
+												animateHit = false;
+												l2_anim = false;
+												r_anim = false;
+												l1_anim = false;
+												v_anim = false;
+												enableButton();
+											}, 500);
+										}, 1000);
+									}, 1000);
+								} else {
+									l2_anim = true;
+									setTimeout(() => {
+										animateHit = true;
+										setTimeout(() => {
+											animateHit = false;
+											l2_anim = false;
+											l1_anim = false;
+											v_anim = false;
+											enableButton();
+										}, 500);
+									}, 1000);
+								}
+							}, 1000);
+						} else {
+							v_anim = true;
+							setTimeout(() => {
+								if (resp.L2_cache_hit == 'Miss') {
+									l2_anim = false;
+									setTimeout(() => {
+										r_anim = false;
+										setTimeout(() => {
+											animateHit = true;
+											setTimeout(() => {
+												animateHit = false;
+												l2_anim = false;
+												r_anim = false;
+												l1_anim = false;
+												v_anim = false;
+												enableButton();
+											}, 500);
+										}, 1000);
+									}, 1000);
+								} else {
+									l2_anim = true;
+									setTimeout(() => {
+										animateHit = true;
+										setTimeout(() => {
+											animateHit = false;
+											l2_anim = false;
+											l1_anim = false;
+											v_anim = false;
+											enableButton();
+										}, 500);
+									}, 1000);
+								}
+							}, 1000);
+						}
+					}, 1000);
+				}
 			});
+	}
+
+	function enableButton() {
+		document.getElementById('getmem').disabled = false;
 	}
 </script>
 
@@ -137,21 +202,25 @@
 				<div class="flex justify-center space-x-4 py-5">
 					<div class="mb-4 text-[#ADD8E6] rounded-lg p-4 text-xl square"></div>
 					<div
-						class="mb-4 text-center justify-center bg-red-500 text-white rounded-lg p-4 text-3xl cpu relative"
+						class="mb-4 text-center justify-center bg-red-500 text-white rounded-lg p-4 text-3xl cpu"
 					>
 						<p class="py-2">CPU</p>
 						<button
+							id="getmem"
 							on:click={handleClick}
 							class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 py-1 rounded text-xl"
 						>
 							Get memory
 						</button>
-						<div class="ball-l1 {l1_anim ? 'ballanim-l1': ''}"></div>
-						<div class="ball-v {v_anim ? 'ballanim-v': ''}"></div>
-						<div class="ball-l2 {l2_anim ? 'ballanim-l2': ''}"></div>
-						<div class="ball-r {r_anim ? 'ballanim-r': ''}"></div>
+						<div class="ball-l1 {l1_anim ? 'ballanim-l1' : ''}"></div>
+						<div class="ball-v {v_anim ? 'ballanim-v' : ''}"></div>
+						<div class="ball-l2 {l2_anim ? 'ballanim-l2' : ''}"></div>
+						<div class="ball-r {r_anim ? 'ballanim-r' : ''}"></div>
 					</div>
-					<div class="mb-4 text-[#ADD8E6] rounded-lg p-4 text-xl square"></div>
+					<div
+						class="mb-4 text-[#ADD8E6] rounded-lg p-4 text-xl square"
+						style="font-size: 10px;"
+					></div>
 				</div>
 				<div class="flex justify-center space-x-4 py-5">
 					<div
@@ -165,50 +234,52 @@
 						<div class="overflow-y-auto h-80">
 							<table class="w-full">
 								{#each resp['L1_cache'] as line}
-									<tr><td style="font-size: 24px;">{line}</td></tr>
+									<div>{line}</div>
 								{/each}
 							</table>
 						</div>
 					</div>
 					<div
 						id="v"
-						class="flex-none bg-blue-500 text-white rounded-lg p-4 text-xl box px-5 {resp.Victim_cache_hit ===
+						class="flex-none bg-blue-500 text-white rounded-lg p-4 text-xl box px-5 {resp.Victim_cache_hit ==
 							'Hit' && animateHit
-							? 'v-hit'
+							? 'vic-hit'
 							: ''}"
 					>
 						<p class="text-xl mb-2">Victim Cache</p>
-						<div class="overflow-y-auto h-80">
+						<div class="overflow-y-auto h-32">
 							<table class="w-full">
 								{#each resp.Victim_cache as line}
-									<tr><td style="font-size: 24px;">{line}</td></tr>
+									<div>
+										{line}
+									</div>
 								{/each}
 							</table>
 						</div>
 					</div>
 					<div
 						id="l2"
-						class="flex-none bg-yellow-500 text-white rounded-lg p-4 text-xl box px-5 {resp.L2_cache_hit ===
+						class="flex-none bg-yellow-500 text-white rounded-lg p-4 text-xl box px-5 {resp.L2_cache_hit ==
 							'Hit' && animateHit
 							? 'l2-hit'
 							: ''}"
 					>
 						<p class="text-xl mb-2">L2 Cache</p>
 						<div class="overflow-y-auto h-80">
-							<table class="w-full">
-								{#each resp.L2_cache as line}
-									<tr><td style="font-size: 24px;">{line}</td></tr>
-								{/each}
-							</table>
+							{#each resp.L2_cache as line}
+								<div>
+									{line}
+								</div>
+							{/each}
 						</div>
 					</div>
 				</div>
 				<div
 					id="ram"
-					class="mt-4 bg-purple-500 text-white rounded-lg p-4 text-4xl py-2 {resp.L1_cache_hit ===
+					class="mt-4 bg-purple-500 text-white rounded-lg p-4 text-4xl py-2 {resp.L1_cache_hit ==
 						'Miss' &&
-					resp.Victim_cache_hit === 'Miss' &&
-					resp.L2_cache_hit === 'Miss' &&
+					resp.Victim_cache_hit == 'Miss' &&
+					resp.L2_cache_hit == 'Miss' &&
 					animateHit
 						? 'ram-hit'
 						: ''}"
@@ -235,12 +306,13 @@
 			opacity: 1;
 		}
 		100% {
-			transform: scale(1);
+			transform: scale(0.5);
 			opacity: 0;
 		}
 	}
 	@keyframes l1-1 {
-		0% {
+		0%,
+		100% {
 			transform: translate(0, 0);
 		}
 		25% {
@@ -252,23 +324,19 @@
 		75% {
 			transform: translate(-180px, 0);
 		}
-		100% {
-			transform: translate(0, 0);
-		}
 	}
-	@keyframes v-1 {
-		0% {
+	@keyframes vic-1 {
+		0%,
+		100% {
 			transform: translate(0, 0);
 		}
 		50% {
 			transform: translate(0, 60px);
 		}
-		100% {
-			transform: translate(0, 0);
-		}
 	}
 	@keyframes l2-1 {
-		0% {
+		0%,
+		100% {
 			transform: translate(0, 0);
 		}
 		25% {
@@ -280,32 +348,33 @@
 		75% {
 			transform: translate(160px, 0);
 		}
-		100% {
-			transform: translate(0, 0);
-		}
 	}
 	@keyframes ram-1 {
-		0% {
+		0%,
+		100% {
 			transform: translate(0, 0);
 		}
 		50% {
 			transform: translate(0, 500px);
 		}
-		100% {
-			transform: translate(0, 0);
-		}
 	}
 	.l1-hit {
-		animation: ripple 0.25s linear;
+		animation:
+			l1-1 0.25s ease,
+			0.25s ease-out;
 	}
-	.v-hit {
+	.vic-hit {
 		animation: ripple 0.25s linear;
 	}
 	.l2-hit {
-		animation: ripple 0.25s linear;
+		animation:
+			l2-1 0.25s ease,
+			ripple 0.25s ease-out;
 	}
 	.ram-hit {
-		animation: ripple 0.25s linear;
+		animation:
+			ram-1 0.25s ease,
+			ripple 0.25s ease-out;
 	}
 	.square {
 		width: 400px;
@@ -314,7 +383,6 @@
 	.cpu {
 		width: 700px;
 		height: 150px;
-		position: relative;
 	}
 	.box {
 		width: 500px;
@@ -330,9 +398,9 @@
 		height: 10px;
 		background-color: black;
 		border-radius: 50%;
-		position: absolute;
-		top: 66%;
-		left: 0%;
+		position: relative;
+		top: -8%;
+		left: -1.5%;
 		transform: translate(-50%, -50%);
 	}
 	.ball-v {
@@ -341,8 +409,8 @@
 		background-color: black;
 		border-radius: 50%;
 		position: absolute;
-		top: 100%;
-		left: 51%;
+		top: 19.7%;
+		left: 50.4%;
 		transform: translate(-50%, -50%);
 	}
 	.ball-l2 {
@@ -351,8 +419,8 @@
 		background-color: black;
 		border-radius: 50%;
 		position: absolute;
-		top: 66%;
-		left: 100%;
+		top: 14%;
+		left: 70.5%;
 		transform: translate(-50%, -50%);
 	}
 	.ball-r {
@@ -361,8 +429,8 @@
 		background-color: black;
 		border-radius: 50%;
 		position: absolute;
-		top: 100%;
-		left: 86.9%;
+		top: 19.6%;
+		left: 65.2%;
 		transform: translate(-50%, -50%);
 	}
 
@@ -375,7 +443,7 @@
 	}
 
 	.ballanim-v {
-		animation: v-1 1s linear;
+		animation: vic-1 0.25s linear;
 	}
 
 	.ballanim-l1 {
