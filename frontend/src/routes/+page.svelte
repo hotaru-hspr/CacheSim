@@ -5,6 +5,8 @@
 	<div class="">
 		<h1 class="py-50 text-6xl">Cache Simulator</h1>
 		<br />
+		<p class="text-xl">v2024.04.28</p>
+		<br />
 		<p class="text-xl">
 			(Warning: Visual bugs will occur on non-1440p monitors, proceed with understanding. Will be
 			fixed soon!)
