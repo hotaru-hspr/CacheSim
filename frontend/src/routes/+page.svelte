@@ -5,9 +5,9 @@
 	<div class="">
 		<h1 class="py-50 text-6xl">Cache Simulator</h1>
 		<br />
-		<p class="text-xl">Before you continue,</p>
 		<p class="text-xl">
-			Make sure you have the FastAPI server running in the background (main.py from the repository).
+			(Warning: Visual bugs will occur on non-1440p monitors, proceed with understanding. Will be
+			fixed soon!)
 		</p>
 		<br />
 		<a href="https://www.github.com/hotaru-hspr/CacheSim"
@@ -17,7 +17,7 @@
 			<button
 				on:click={() => {
 					window.location.href = '/sim';
-				}}>Next</button
+				}}>Proceed to Simulation</button
 			>
 		</div>
 	</div>
