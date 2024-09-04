@@ -8,7 +8,9 @@ Prototype for an updated Cache Simulator planned.
 
 ## Working/Bugs
 
-It works enough 👍
+It works enough to present 👍
+
+Unless your display resolution is 1440p, it will look weird. 16:9 monitors can zoom-in/out to find a satisfiable look.
 
 ## Run
 
