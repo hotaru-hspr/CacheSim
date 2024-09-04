@@ -4,7 +4,7 @@
 
 A cache simulation program to demonstrate the Hit/Miss actions in L1, Victim and L2 caches, and retrieval of data from the cache and RAM, animated for a better visualisation. Direct cache mapping and set associative mapping have been simulated in the backend for the respective processes.
 
-Prototype for an updated Cache Simulator planned.
+This is a prototype for a planned updated Cache Simulator version.
 
 ## Working/Bugs
 
@@ -22,8 +22,7 @@ To run the backend, ```cd backend``` and ```python main.py```.
 
 ## Tech Stack
 
-- Svelte + JS
-- TailwindCSS
+- Svelte
 - FastAPI (Python)
 
 ## Team
