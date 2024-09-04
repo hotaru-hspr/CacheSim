@@ -8,7 +8,7 @@ Prototype for an updated Cache Simulator planned.
 
 ## Working/Bugs
 
-It works, till an extent.
+It works enough 👍
 
 ## Run
 
